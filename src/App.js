@@ -1,20 +1,34 @@
+import { useForm } from 'react-hook-form'
+import axios from 'axios'
+
 function App() {
+  const { register, handleSubmit } = useForm()
+
+  const onSubmit = data => {
+    try {
+      const client = axios.create({
+        baseURL: 'https://habitica.com',
+        headers: {
+          'x-client': process.env.REACT_APP_HABITICA_USER_ID + '-taskinator',
+          'x-api-user': process.env.REACT_APP_HABITICA_USER_ID,
+          'x-api-key': process.env.REACT_APP_HABITICA_API_CODE,
+        },
+      })
+
+      client.post('/api/v3/tasks/user', {
+        text: data.title,
+        type: 'todo',
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
-    <div>
-      <header className='flex flex-col items-center'>
-        <p className='bg-red-100'>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className='App-link'
-          href='https://reactjs.org'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input defaultValue='Task teste' {...register('title')} />
+      <input type='submit' />
+    </form>
   )
 }
 
