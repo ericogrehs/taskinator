@@ -1,27 +1,22 @@
-import { useForm } from 'react-hook-form'
+import { ChakraProvider } from '@chakra-ui/react'
+import styled from 'styled-components'
 
-import { createTask } from './services/tasks'
+import Home from './routes/Home'
 
 function App() {
-  const { register, handleSubmit } = useForm()
-
-  const onSubmit = async data => {
-    try {
-      await createTask({
-        text: data.title,
-        type: 'todo',
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input defaultValue='Task teste' {...register('title')} />
-      <input type='submit' />
-    </form>
+    <ChakraProvider>
+      <Container>
+        <Home />
+      </Container>
+    </ChakraProvider>
   )
 }
+
+const Container = styled.div`
+  background-color: black;
+  color: white;
+  min-height: 100vh;
+`
 
 export default App
