@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
 import { Controller } from 'react-hook-form'
 
-import { getTags } from '../services/tags'
+import useStore from '../hooks/useStore'
 
 import {
   Menu,
@@ -13,21 +12,7 @@ import {
 } from '@chakra-ui/react'
 
 const TagList = ({ control, name }) => {
-  const [tags, setTags] = useState([])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const {
-          data: { data: tags },
-        } = await getTags()
-        setTags(tags)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
+  const { tags } = useStore()
 
   return (
     <Menu closeOnSelect={false} placement='right-start'>
@@ -42,8 +27,14 @@ const TagList = ({ control, name }) => {
         <Controller
           control={control}
           name={name}
-          render={({ field: { onChange } }) => (
-            <MenuOptionGroup type='checkbox' onChange={onChange}>
+          render={({ field: { onChange, onBlur, value, ref } }) => (
+            <MenuOptionGroup
+              type='checkbox'
+              onBlur={onBlur}
+              onChange={onChange}
+              value={value}
+              inputRef={ref}
+            >
               {tags.map(({ name, id }) => (
                 <MenuItemOption key={id} value={id}>
                   {name}
