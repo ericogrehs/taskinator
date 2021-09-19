@@ -3,9 +3,11 @@ import styled from 'styled-components'
 
 import Home from './routes/Home'
 
+import colorMode from './styles/colorMode'
+
 function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={colorMode}>
       <Container>
         <Home />
       </Container>
@@ -14,8 +16,6 @@ function App() {
 }
 
 const Container = styled.div`
-  background-color: black;
-  color: white;
   min-height: 100vh;
 `
 
