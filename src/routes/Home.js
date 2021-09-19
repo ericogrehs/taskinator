@@ -1,27 +1,12 @@
-import { useEffect, useState } from 'react'
 import { Stack, StackDivider, Center, Box } from '@chakra-ui/react'
 
 import TaskItem from '../components/TaskItem'
 import CreateTaskForm from '../components/CreateTaskForm'
 
-import { getTodos } from '../services/tasks'
+import useStore from '../hooks/useStore'
 
 function Home() {
-  const [tasks, setTasks] = useState([])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const {
-          data: { data: tasks },
-        } = await getTodos()
-        setTasks(tasks)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchData()
-  }, [])
+  const { tasks } = useStore()
 
   return (
     <>
