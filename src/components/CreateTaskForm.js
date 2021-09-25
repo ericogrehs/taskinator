@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Input, Button, Box, Stack } from '@chakra-ui/react'
+import { Input, Box, Stack, Button } from '@chakra-ui/react'
 import InputMask from 'react-input-mask'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 import TagList from './TagList'
 
@@ -8,15 +10,34 @@ import { createTask } from '../services/tasks'
 import useToastEmitter from '../hooks/useToastEmitter'
 import useStore from '../hooks/useStore'
 import { formatDateToApi } from '../helpers/formatters'
+import { createTaskSchema } from '../validators/createTask'
+import { IDLE, SUBMITTING } from '../constants/states'
 
 function CreateTaskForm() {
-  const { register, handleSubmit, control, setValue } = useForm()
+  const [state, setState] = useState(IDLE)
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(createTaskSchema),
+    mode: 'onChange',
+  })
 
   const toast = useToastEmitter()
   const { fetchTasks } = useStore()
 
+  const clearFields = () => {
+    setValue('title', '')
+    setValue('duedate', '')
+    setValue('tags', [])
+  }
+
   const onSubmit = async data => {
     try {
+      setState(SUBMITTING)
       await createTask({
         text: data?.title,
         type: 'todo',
@@ -25,11 +46,12 @@ function CreateTaskForm() {
       })
       toast.success('Tarefa criada com sucesso')
       fetchTasks()
-      setValue('title', '')
-      setValue('tags', [])
+      clearFields()
     } catch (error) {
       console.error(error?.response?.data)
       toast.error('Ocorreu um erro ao tentar criar uma nova tarefa')
+    } finally {
+      setState(IDLE)
     }
   }
 
@@ -37,17 +59,28 @@ function CreateTaskForm() {
     <Box as='form' onSubmit={handleSubmit(onSubmit)} my='32px' w='400px'>
       <Stack spacing='16px'>
         <Stack direction='row'>
-          <Input placeholder='Nome da Tarefa' {...register('title')} />
+          <Input
+            placeholder='Nome da Tarefa'
+            isInvalid={errors.title?.message}
+            errorBorderColor='red.300'
+            {...register('title')}
+          />
           <TagList control={control} name='tags' />
         </Stack>
         <Input
           as={InputMask}
           mask='99/99/9999'
-          // maskChar={null}
           placeholder='Data da Tarefa'
+          isInvalid={errors.duedate?.message}
+          errorBorderColor='red.300'
           {...register('duedate')}
         />
-        <Button type='submit' colorScheme='blue'>
+        <Button
+          type='submit'
+          colorScheme='blue'
+          isLoading={state === SUBMITTING}
+          loadingText='Enviando'
+        >
           Criar
         </Button>
       </Stack>
