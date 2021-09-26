@@ -15,6 +15,7 @@ import { IDLE, SUBMITTING } from '../constants/states'
 
 function CreateTaskForm() {
   const [state, setState] = useState(IDLE)
+
   const {
     register,
     handleSubmit,
@@ -68,6 +69,7 @@ function CreateTaskForm() {
           <TagList control={control} name='tags' />
         </Stack>
         <Input
+          // REMINDER: "findDOMNode is deprecated in StrictMode" warning ocorre pelo uso da InputMask
           as={InputMask}
           mask='99/99/9999'
           placeholder='Data da Tarefa'
